@@ -1,0 +1,44 @@
+name: release
+
+# Trigger workflow on push of any tag starting with "v"
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  DOCKER_USERNAME: donepuchie
+  REPO: donepuchie/auto-version-ci
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest                        # Use the latest Ubuntu runner
+    timeout-minutes: 15                           # Fail the job if it exceeds 15 minutes
+
+    steps:
+      # Checkout the code repository (fetch all commits for completeness)
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Extract the version from the Git tag and set it as an environment variable
+      - name: Extract release version from tag
+        run: echo "VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+      # Authenticate with DockerHub using a Personal Access Token (PAT) stored in GitHub Secrets
+      - name: Authenticate to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Build the Docker image and push it to DockerHub with both "latest" and version-specific tags
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: >-
+            ${{ env.REPO }}:latest,
+            ${{ env.REPO }}:${{ env.VERSION }}
