@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 env:
   DOCKER_USERNAME: donepuchie                     # DockerHub username
   REPO: donepuchie/auto-version-ci               # DockerHub repository name (user/repo)
