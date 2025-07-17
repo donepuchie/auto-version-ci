@@ -19,4 +19,4 @@ if __name__ == "__main__":
     uvicorn.run(app)
 
 
-# if __name__ == "app.main":
+# if __name__ == "app.main": #     # Production configuration
